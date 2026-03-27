@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } fromfrom '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 interface LoginResponse {
   message: string;
