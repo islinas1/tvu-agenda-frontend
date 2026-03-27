@@ -9,17 +9,17 @@ import { Contact } from '../interfaces/contact.interface';
 })
 export class ContactService {
   private http = inject(HttpClient);
-  private readonly API_URL = `${environment.apiUrl}/contacts`;
+  private readonly API_URL = environment.apiUrl;
 
   getContacts(search: string = ''): Observable<Contact[]> {
     let params = new HttpParams();
     if (search.trim()) {
       params = params.set('search', search);
     }
-    return this.http.get<Contact[]>(this.API_URL, { params });
+    return this.http.get<Contact[]>(`${this.API_URL}/contacts`, { params });
   }
 
   createContact(contact: Partial<Contact>): Observable<Contact> {
-    return this.http.post<Contact>(this.API_URL, contact);
+    return this.http.post<Contact>(`${this.API_URL}/contacts`, contact);
   }
 }
