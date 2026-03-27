@@ -1,0 +1,26 @@
+<div class="login-page">
+    <div class="login-card">
+        <div class="logos-top logos-row">
+            <img src="LOGORADIO.png" alt="TVU Logo 1" class="logo logo-main">
+            <img src="LOGO TVU.png" alt="TVU Logo 2" class="logo logo-main">
+        </div>
+
+        <div class="divider"></div>
+
+        <h3 class="title">AGENDA</h3>
+        <p class="subtitle">Ingresa tu C.I.</p>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <input matInput type="text" [(ngModel)]="ci" placeholder="C.I.">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" *ngIf="requirePassword">
+            <input matInput id="passwordInput" type="password" [(ngModel)]="password" placeholder="Contraseña">
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" class="login-button" type="button" (click)="ingresar()">
+            Iniciar
+        </button>
+        
+    </div>
+</div>
