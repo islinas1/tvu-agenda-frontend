@@ -17,11 +17,11 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   login(ci: string, password?: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { ci, password });
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, { ci, password });
   }
   checkCI(ci: string): Observable<{ role: 'admin' | 'usuario', redirect: string }> {
     return this.http.post<{ role: 'admin' | 'usuario', redirect: string }>(
-      `${this.apiUrl}/check-ci`, { ci }
+      `${this.apiUrl}/auth/check-ci`, { ci }
     );
   }
   
