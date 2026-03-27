@@ -43,10 +43,10 @@ export class LoginComponent {
 					}
 				},
 				error: (err: any) => {
-					alert(err.error?.error || 'Error al verificar C.I');
+					alert(err.error?.error || 'Error al verificar C.I.');
 				}
 			});
-			return; 
+			return;
 		}
 
 		// Segunda fase: enviar CI + password
@@ -57,7 +57,8 @@ export class LoginComponent {
 
 		this.authService.login(this.ci, this.password).subscribe({
 			next: (res: any) => {
-				this.router.navigate([res.redirect]);
+				this.router.navigate(['/dashboard']);
+				//this.router.navigate([res.redirect]);
 			},
 			error: (err: any) => {
 				alert(err.error?.error || 'Error al iniciar sesión');

@@ -26,6 +26,7 @@ import { Contact } from '../../interfaces/contact.interface';
   templateUrl: './contacts.component.html',
   styleUrls: ['./contacts.component.css']
 })
+
 export class ContactsComponent implements OnInit {
   private contactService = inject(ContactService);
   private cd = inject(ChangeDetectorRef);

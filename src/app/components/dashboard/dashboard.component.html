@@ -1,0 +1,47 @@
+<div class="principal-page">
+    <div class="principal-card">
+        <div class="logos-top logos-row">
+            <img src="LOGORADIO.png" alt="Logo Radio" class="logo logo-main">
+            <img src="LOGO TVU.png" alt="Logo TVU" class="logo logo-main">
+        </div>
+
+        <div class="divider"></div>
+
+        <h1 class="title">DASHBOARD PRINCIPAL</h1>
+        <p class="subtitle">Selecciona el módulo al que deseas ingresar</p>
+
+        <div class="panel-grid">
+            <mat-card class="panel-card panel-users">
+                <div class="panel-icon-wrap">
+                    <mat-icon class="panel-icon">admin_panel_settings</mat-icon>
+                </div>
+
+                <h2 class="panel-title">CONTROL DE USUARIOS</h2>
+                <p class="panel-text">
+                    Consulta quién ingresa al sistema y administra el control visual de accesos.
+                </p>
+
+                <button mat-raised-button color="primary" class="panel-button" type="button" (click)="abrirControlUsuarios()">
+						<mat-icon>arrow_forward</mat-icon>
+						<span>Ingresar</span>
+					</button>
+            </mat-card>
+
+            <mat-card class="panel-card panel-contactos">
+                <div class="panel-icon-wrap">
+                    <mat-icon class="panel-icon">contacts</mat-icon>
+                </div>
+
+                <h2 class="panel-title">VER CONTACTOS</h2>
+                <p class="panel-text">
+                    Accede al dashboard de contactos para registrar, editar y eliminar registros.
+                </p>
+
+                <button mat-raised-button color="primary" class="panel-button" type="button" (click)="abrirContactos()">
+						<mat-icon>arrow_forward</mat-icon>
+						<span>Ingresar</span>
+					</button>
+            </mat-card>
+        </div>
+    </div>
+</div>
