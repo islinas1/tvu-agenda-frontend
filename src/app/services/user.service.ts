@@ -2,23 +2,24 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../interfaces/user.interface';
+import { environment } from '../../enveronments/enveronments';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
   private http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:3000/api/users';
+  private readonly API_URL = environment.apiUrl;
 
   getUsers(search: string = ''): Observable<User[]> {
     let params = new HttpParams();
     if (search.trim()) {
       params = params.set('search', search);
     }
-    return this.http.get<User[]>(this.API_URL, { params });
+    return this.http.get<User[]>(`${this.API_URL}/users`, { params });
   }
 
   createUser(user: Partial<User>): Observable<User> {
-    return this.http.post<User>(this.API_URL, user);
+    return this.http.post<User>(`${this.API_URL}/users`, user);
   }
 }
