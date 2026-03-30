@@ -192,7 +192,7 @@
 .table-watermark {
     position: absolute;
     inset: 0;
-    background-image: url('/MARCAAGUA.png');
+    background-image: url('/public/MARCAAGUA.png');
     background-repeat: no-repeat;
     background-position: center;
     background-size: 180px;

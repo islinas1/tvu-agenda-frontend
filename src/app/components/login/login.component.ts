@@ -7,7 +7,6 @@ import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
-
 @Component({
 	selector: 'app-login',
 	standalone: true,
@@ -19,51 +18,60 @@ export class LoginComponent {
 	ci: string = '';
 	password: string = '';
 	requirePassword: boolean = false;
+	loading: boolean = false;
+	errorMessage: string = '';
 
 	constructor(private router: Router, private authService: AuthService) { }
 
 	ingresar() {
+		// Evitar multiples clics mientras se procesa
+		if (this.loading) return;
+
 		if (!this.ci.trim()) {
-			alert('INGRESE SU C.I.');
+			this.errorMessage = 'Ingrese su C.I.';
 			return;
 		}
 
+		this.errorMessage = '';
+
+		// FASE 1: Solo se ingreso el C.I., verificar rol
 		if (!this.requirePassword) {
-			// Primera fase: detectar rol
+			this.loading = true;
 			this.authService.checkCI(this.ci).subscribe({
 				next: (res: any) => {
+					this.loading = false;
 					if (res.role === 'usuario') {
-						// redirige directo
 						this.router.navigate([res.redirect]);
 					}
 					if (res.role === 'admin') {
-						// activa input de contraseña
 						this.requirePassword = true;
-						setTimeout(() => document.getElementById('passwordInput')?.focus(), 0);
+						setTimeout(() => document.getElementById('passwordInput')?.focus(), 100);
 					}
 				},
 				error: (err: any) => {
-					alert(err.error?.error || 'Error al verificar C.I.');
+					this.loading = false;
+					this.errorMessage = err.error?.error || 'Error al verificar C.I.';
 				}
 			});
 			return;
 		}
 
-		// Segunda fase: enviar CI + password
+		// FASE 2: Admin ya ingreso C.I., ahora pone contraseña
 		if (!this.password) {
-			alert('Ingrese su contraseña');
+			this.errorMessage = 'Ingrese su contraseña';
 			return;
 		}
 
+		this.loading = true;
 		this.authService.login(this.ci, this.password).subscribe({
 			next: (res: any) => {
-				this.router.navigate(['/dashboard']);
-				//this.router.navigate([res.redirect]);
+				this.loading = false;
+				this.router.navigate([res.redirect]);
 			},
 			error: (err: any) => {
-				alert(err.error?.error || 'Error al iniciar sesión');
+				this.loading = false;
+				this.errorMessage = err.error?.error || 'Error al iniciar sesion';
 			}
 		});
 	}
-
 }
