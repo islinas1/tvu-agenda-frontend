@@ -345,3 +345,142 @@
         font-size: 1.65rem;
     }
 }
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+}
+ 
+.add-button {
+    border-radius: 14px !important;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+ 
+.form-panel {
+    background: linear-gradient(180deg, #f0f7ff 0%, #e0edfc 100%);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+ 
+.form-title {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #102341;
+    text-align: center;
+}
+ 
+.form-error {
+    color: #dc2626;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 10px;
+    padding: 6px 12px;
+    background: rgba(220, 38, 38, 0.08);
+    border-radius: 8px;
+}
+ 
+.form-success {
+    color: #15803d;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 10px;
+    padding: 6px 12px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 8px;
+}
+ 
+.full-width {
+    width: 100%;
+}
+ 
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+}
+ 
+.form-actions button {
+    border-radius: 12px !important;
+    font-weight: 700;
+}
+ 
+/* Telefonos */
+.phones-section {
+    margin-bottom: 12px;
+}
+ 
+.phones-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #17345a;
+    margin: 0 0 8px;
+}
+ 
+.phone-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+ 
+.phone-field {
+    flex: 1;
+}
+ 
+.phone-remove {
+    color: #dc2626 !important;
+    margin-bottom: 20px;
+}
+ 
+.phone-add {
+    border-radius: 12px !important;
+    font-weight: 600;
+    font-size: 0.82rem !important;
+    margin-bottom: 8px;
+    color: #2563eb !important;
+    border-color: #93c5fd !important;
+}
+ 
+/* Acciones en tabla */
+.actions-cell {
+    display: flex;
+    gap: 4px;
+}
+ 
+.edit-btn {
+    color: #2563eb !important;
+}
+ 
+.delete-btn {
+    color: #dc2626 !important;
+}
+ 
+.confirm-delete {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+ 
+.confirm-text {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #dc2626;
+}
+ 
+.confirm-yes {
+    color: #dc2626 !important;
+}
+ 
+.confirm-no {
+    color: #64748b !important;
+}
+ 

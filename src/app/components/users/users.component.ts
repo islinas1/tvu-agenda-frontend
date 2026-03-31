@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
 import { UserService } from '../../services/user.service';
 import { User } from '../../interfaces/user.interface';
 
@@ -19,21 +20,25 @@ import { User } from '../../interfaces/user.interface';
 		MatFormFieldModule,
 		MatIconModule,
 		MatInputModule,
-		MatTableModule
+		MatTableModule,
+		MatSelectModule
 	],
 	templateUrl: './users.component.html',
 	styleUrls: ['./users.component.css']
 })
-
 export class UsersComponent implements OnInit {
 	private userService = inject(UserService);
 	private cd = inject(ChangeDetectorRef);
 
 	searchQuery: string = '';
-	activeFilters: Set<string> = new Set();
 	allUsers: User[] = [];
 	filteredUsers: User[] = [];
-	displayedColumns: string[] = ['name', 'last_name', 'role', 'ci', 'expiration_date', 'is_active',  'actions'];
+	displayedColumns: string[] = ['name', 'last_name', 'role', 'ci', 'expiration_date', 'is_active', 'actions'];
+
+	showForm: boolean = false;
+	formData = { name: '', last_name: '', ci: '', id_role: 2, password: '' };
+	formError: string = '';
+	formSuccess: string = '';
 
 	ngOnInit(): void {
 		this.loadUsers();
@@ -52,40 +57,78 @@ export class UsersComponent implements OnInit {
 
 	applyFilters(): void {
 		const text = this.searchQuery.trim().toLowerCase();
-
-		// Si no hay búsqueda ni filtros activos, mostrar todos
-		if (text === '' && this.activeFilters.size === 0) {
+		if (text === '') {
 			this.filteredUsers = this.allUsers;
 			return;
 		}
+		this.filteredUsers = this.allUsers.filter(user =>
+			user.name?.toLowerCase().includes(text) ||
+			user.last_name?.toLowerCase().includes(text) ||
+			user.ci?.toString().includes(text) ||
+			user.role?.toLowerCase().includes(text)
+		);
+	}
 
-		this.filteredUsers = this.allUsers.filter(user => {
-			// Filtrado por botones activos
-			if (this.activeFilters.size > 0) {
-				return Array.from(this.activeFilters).some(filter => {
-					if (filter === 'name') return user.name?.toLowerCase().includes(text);
-					//if (filter === 'institution') return user.user_institution?.toLowerCase().includes(text);
-					//if (filter === 'position') return user.user_position?.toLowerCase().includes(text);
-					return false;
-				});
-			}
+	clearSearch(): void {
+		this.searchQuery = '';
+		this.applyFilters();
+	}
 
-			// Búsqueda global si no hay botones activos
-			return (
-				user.name?.toLowerCase().includes(text) ||
-				user.last_name?.toLowerCase().includes(text) ||
-				user.ci.toString().includes(text) ||
-				user.expiration_date.toString().includes(text) ||
-				user.is_active.toString().includes(text) ||
-				user.role.toLowerCase().includes(text)
-			);
+	cambiarEstado(usuario: User): void {
+		if (usuario.is_active) {
+			this.userService.deactivateUser(usuario.id_user).subscribe({
+				next: () => this.loadUsers(),
+				error: (err) => console.error('Error al desactivar', err)
+			});
+		} else {
+			this.userService.updateUser(usuario.id_user, {
+				id_role: usuario.role === 'ADMINISTRADOR' ? 1 : 2,
+				name: usuario.name,
+				last_name: usuario.last_name,
+				ci: usuario.ci,
+				is_active: true,
+				expiration_date: usuario.expiration_date
+			}).subscribe({
+				next: () => this.loadUsers(),
+				error: (err) => console.error('Error al activar', err)
+			});
+		}
+	}
+
+	abrirFormulario(): void {
+		this.formData = { name: '', last_name: '', ci: '', id_role: 2, password: '' };
+		this.formError = '';
+		this.formSuccess = '';
+		this.showForm = true;
+	}
+
+	cancelarFormulario(): void {
+		this.showForm = false;
+		this.formError = '';
+		this.formSuccess = '';
+	}
+
+	guardarUsuario(): void {
+		if (!this.formData.name.trim() || !this.formData.last_name.trim() || !this.formData.ci.toString().trim()) {
+			this.formError = 'Nombre, apellido y CI son obligatorios';
+			return;
+		}
+		this.formError = '';
+
+		this.userService.createUser({
+			name: this.formData.name,
+			last_name: this.formData.last_name,
+			ci: Number(this.formData.ci),
+			id_role: this.formData.id_role,
+			password: this.formData.password || this.formData.ci,
+			is_active: true
+		} as any).subscribe({
+			next: () => {
+				this.formSuccess = 'Usuario creado exitosamente';
+				this.loadUsers();
+				setTimeout(() => this.cancelarFormulario(), 1200);
+			},
+			error: (err) => this.formError = err.error?.error || 'Error al crear usuario'
 		});
 	}
-	cambiarEstado(usuario: User): void {
-		//usuario.estado = usuario.estado === 'Activo' ? 'Inactivo' : 'Activo';
-	}
-	clearSearch(): void {
-    this.searchQuery = '';
-    this.applyFilters();
-  }
 }

@@ -22,4 +22,16 @@ export class ContactService {
   createContact(contact: Partial<Contact>): Observable<Contact> {
     return this.http.post<Contact>(`${this.API_URL}/contacts`, contact);
   }
+
+  updateContact(id: number, contact: Partial<Contact>): Observable<Contact> {
+    return this.http.put<Contact>(`${this.API_URL}/contacts/${id}`, contact);
+  }
+
+  deactivateContact(id: number): Observable<any> {
+    return this.http.patch(`${this.API_URL}/contacts/deactivate/${id}`, {});
+  }
+
+  deleteContact(id: number): Observable<any> {
+    return this.http.delete(`${this.API_URL}/contacts/${id}`);
+  }
 }

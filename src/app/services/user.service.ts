@@ -22,4 +22,12 @@ export class UserService {
   createUser(user: Partial<User>): Observable<User> {
     return this.http.post<User>(`${this.API_URL}/users`, user);
   }
+
+  updateUser(id: number, user: any): Observable<User> {
+    return this.http.put<User>(`${this.API_URL}/users/${id}`, user);
+  }
+
+  deactivateUser(id: number): Observable<any> {
+    return this.http.patch(`${this.API_URL}/users/deactivate/${id}`, {});
+  }
 }
