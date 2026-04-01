@@ -9,29 +9,29 @@ import { environment } from '../../environments/environments';
 })
 export class ContactService {
   private http = inject(HttpClient);
-  private readonly API_URL = environment.apiUrl;
+  private readonly API_URL = environment.apiUrl + '/contacts';
 
   getContacts(search: string = ''): Observable<Contact[]> {
     let params = new HttpParams();
     if (search.trim()) {
       params = params.set('search', search);
     }
-    return this.http.get<Contact[]>(`${this.API_URL}/contacts`, { params });
+    return this.http.get<Contact[]>(this.API_URL, { params });
   }
 
-  createContact(contact: Partial<Contact>): Observable<Contact> {
-    return this.http.post<Contact>(`${this.API_URL}/contacts`, contact);
+  createContact(contact: any): Observable<Contact> {
+    return this.http.post<Contact>(this.API_URL, contact);
   }
 
-  updateContact(id: number, contact: Partial<Contact>): Observable<Contact> {
-    return this.http.put<Contact>(`${this.API_URL}/contacts/${id}`, contact);
+  updateContact(id: number, contact: any): Observable<Contact> {
+    return this.http.put<Contact>(`${this.API_URL}/${id}`, contact);
   }
 
   deactivateContact(id: number): Observable<any> {
-    return this.http.patch(`${this.API_URL}/contacts/deactivate/${id}`, {});
+    return this.http.patch(`${this.API_URL}/deactivate/${id}`, {});
   }
 
   deleteContact(id: number): Observable<any> {
-    return this.http.delete(`${this.API_URL}/contacts/${id}`);
+    return this.http.delete(`${this.API_URL}/${id}`);
   }
 }

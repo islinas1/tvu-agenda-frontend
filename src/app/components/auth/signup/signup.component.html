@@ -1,0 +1,72 @@
+<div class="pagina-formulario">
+    <div class="contenedor-formulario">
+        <div class="cabecera-formulario">
+            <div class="icono-cabecera">
+                <mat-icon>person_add</mat-icon>
+            </div>
+
+            <div class="titulo-bloque">
+                <span class="etiqueta-superior">NUEVO USUARIO</span>
+                <h2>Registrarse</h2>
+                <p>Complete el formulario con sus datos personales</p>
+            </div>
+        </div>
+
+        <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+        <div class="formulario-columna" *ngIf="!registroExitoso">
+            <div class="grupo-campo">
+                <label class="etiqueta-campo">Nombre</label>
+                <mat-form-field appearance="outline" class="campo-redondo">
+                    <input matInput type="text" [(ngModel)]="nombre" placeholder="Ingrese su nombre">
+                </mat-form-field>
+            </div>
+
+            <div class="grupo-campo">
+                <label class="etiqueta-campo">Apellido</label>
+                <mat-form-field appearance="outline" class="campo-redondo">
+                    <input matInput type="text" [(ngModel)]="apellido" placeholder="Ingrese su apellido">
+                </mat-form-field>
+            </div>
+
+            <div class="grupo-campo">
+                <label class="etiqueta-campo">C.I.</label>
+                <mat-form-field appearance="outline" class="campo-redondo">
+                    <input matInput type="text" [(ngModel)]="ci" placeholder="Ingrese su C.I.">
+                </mat-form-field>
+            </div>
+
+            <div class="acciones">
+                <button mat-raised-button type="button" class="boton-guardar"
+                    (click)="registrar()" [disabled]="loading">
+                    <mat-icon>save</mat-icon>
+                    {{ loading ? 'Registrando...' : 'Registrarse' }}
+                </button>
+
+                <button mat-stroked-button type="button" class="boton-limpiar" (click)="limpiarFormulario()">
+                    <mat-icon>refresh</mat-icon>
+                    Limpiar
+                </button>
+            </div>
+
+            <p class="link-login">Ya tienes cuenta?
+                <a (click)="irAlLogin()" class="link">Iniciar sesion</a>
+            </p>
+        </div>
+    </div>
+
+    <mat-card class="panel-resultado" *ngIf="registroExitoso">
+        <div class="resultado-icono">
+            <mat-icon>check_circle</mat-icon>
+        </div>
+
+        <h3>Registro completado</h3>
+        <p>Su cuenta fue creada. Un administrador debe activarla antes de que pueda ingresar.</p>
+
+        <button mat-raised-button type="button" class="boton-guardar" (click)="irAlLogin()"
+            style="width: 100%; margin-top: 12px;">
+            <mat-icon>arrow_back</mat-icon>
+            Ir al login
+        </button>
+    </mat-card>
+</div>

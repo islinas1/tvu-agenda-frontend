@@ -1,79 +1,73 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environments';
-
-interface LoginResponse {
-  message: string;
-  role: 'admin' | 'usuario';
-  redirect: string;
-  token: string;
-}
-
-interface CheckCIResponse {
-  role: 'admin' | 'usuario';
-  redirect: string;
-  token?: string;
-}
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
-  
+  private apiUrl = environment.apiUrl + '/auth';
+
   constructor(private http: HttpClient) { }
 
-  checkCI(ci: string): Observable<CheckCIResponse> {
-    return this.http.post<CheckCIResponse>(
-      `${this.apiUrl}/auth/check-ci`, { ci }
-    ).pipe(
-      tap(res => {
-        if (res.token) {
-          localStorage.setItem('token', res.token);
-        }
-      })
-    );
+  login(ci: string, password?: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { ci, password })
+      .pipe(
+        tap(res => {
+          if (res.token) {
+            localStorage.setItem('token', res.token);
+            // Extraer user del token directamente
+            const payload = JSON.parse(atob(res.token.split('.')[1]));
+            localStorage.setItem('user', JSON.stringify(payload));
+          }
+        })
+      );
   }
 
-  login(ci: string, password?: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
-      `${this.apiUrl}/auth/login`, { ci, password }
-    ).pipe(
-      tap(res => {
-        if (res.token) {
-          localStorage.setItem('token', res.token);
-        }
-      })
-    );
+  getUser() {
+    const raw = localStorage.getItem('user');
+    if (!raw || raw === 'undefined' || raw === 'null') return {};
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return {};
+    }
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  getRole(): number {
+    const user = this.getUser();
+    // El token tiene role_id como numero directo
+    if (user.role_id) return user.role_id;
+    // Fallback: si tiene role como string
+    if (user.role === 'admin') return 1;
+    if (user.role === 'usuario') return 2;
+    return 0;
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 1;
   }
 
   isLoggedIn(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 > Date.now();
-    } catch {
-      return false;
-    }
+    return !!localStorage.getItem('token');
   }
 
-  getUserRole(): string | null {
-    const token = this.getToken();
-    if (!token) return null;
-    try {
-      return JSON.parse(atob(token.split('.')[1])).role;
-    } catch {
-      return null;
-    }
-  }
-
-  logout(): void {
+  logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
+
+  checkCI(ci: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/check-ci`, { ci }).pipe(
+      tap(res => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          const payload = JSON.parse(atob(res.token.split('.')[1]));
+          localStorage.setItem('user', JSON.stringify(payload));
+        }
+      })
+    );
   }
 }

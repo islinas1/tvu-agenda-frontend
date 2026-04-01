@@ -9,25 +9,34 @@ import { environment } from '../../environments/environments';
 })
 export class UserService {
   private http = inject(HttpClient);
-  private readonly API_URL = environment.apiUrl;
+  private readonly API_URL = environment.apiUrl + '/users';
 
   getUsers(search: string = ''): Observable<User[]> {
     let params = new HttpParams();
     if (search.trim()) {
       params = params.set('search', search);
     }
-    return this.http.get<User[]>(`${this.API_URL}/users`, { params });
+    return this.http.get<User[]>(this.API_URL, { params });
   }
 
-  createUser(user: Partial<User>): Observable<User> {
-    return this.http.post<User>(`${this.API_URL}/users`, user);
+  createUser(user: any): Observable<User> {
+    return this.http.post<User>(this.API_URL, user);
+  }
+
+  // Registro publico (no necesita token)
+  signup(data: { name: string; last_name: string; ci: number }): Observable<any> {
+    return this.http.post(`${this.API_URL}/signup`, data);
   }
 
   updateUser(id: number, user: any): Observable<User> {
-    return this.http.put<User>(`${this.API_URL}/users/${id}`, user);
+    return this.http.put<User>(`${this.API_URL}/${id}`, user);
   }
 
   deactivateUser(id: number): Observable<any> {
-    return this.http.patch(`${this.API_URL}/users/deactivate/${id}`, {});
+    return this.http.patch(`${this.API_URL}/deactivate/${id}`, {});
+  }
+
+  activateUser(id: number): Observable<any> {
+    return this.http.patch(`${this.API_URL}/activate/${id}`, {});
   }
 }
