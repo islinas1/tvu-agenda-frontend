@@ -6,7 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { UserService } from '../../../services/user.service';
+import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../interfaces/user.interface';
 
 @Component({
@@ -22,6 +24,8 @@ import { User } from '../../../interfaces/user.interface';
 })
 export class UsersComponent implements OnInit {
 	private userService = inject(UserService);
+	private authService = inject(AuthService);
+	private router = inject(Router);
 	private cd = inject(ChangeDetectorRef);
 
 	searchQuery: string = '';
@@ -29,9 +33,7 @@ export class UsersComponent implements OnInit {
 	filteredUsers: User[] = [];
 	displayedColumns: string[] = ['name', 'last_name', 'role', 'ci', 'expiration_date', 'is_active', 'actions'];
 
-	ngOnInit(): void {
-		this.loadUsers();
-	}
+	ngOnInit(): void { this.loadUsers(); }
 
 	loadUsers(): void {
 		this.userService.getUsers().subscribe({
@@ -60,29 +62,24 @@ export class UsersComponent implements OnInit {
 		this.cd.markForCheck();
 	}
 
-	clearSearch(): void {
-		this.searchQuery = '';
-		this.applyFilters();
-	}
+	clearSearch(): void { this.searchQuery = ''; this.applyFilters(); }
 
-	// FUNCIONAL: activar/desactivar usuario
 	cambiarEstado(usuario: User): void {
 		if (usuario.is_active) {
 			this.userService.deactivateUser(usuario.id_user).subscribe({
 				next: () => this.loadUsers(),
-				error: (err) => {
-					console.error('Error al desactivar', err);
-					alert(err.error?.error || 'Error al desactivar usuario');
-				}
+				error: (err) => alert(err.error?.error || 'Error al desactivar')
 			});
 		} else {
 			this.userService.activateUser(usuario.id_user).subscribe({
 				next: () => this.loadUsers(),
-				error: (err) => {
-					console.error('Error al activar', err);
-					alert(err.error?.error || 'Error al activar usuario');
-				}
+				error: (err) => alert(err.error?.error || 'Error al activar')
 			});
 		}
+	}
+
+	cerrarSesion(): void {
+		this.authService.logout();
+		this.router.navigate(['/login']);
 	}
 }

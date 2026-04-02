@@ -178,3 +178,36 @@
         height: 44px;
     }
 }
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.top-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.greeting {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #102341;
+}
+.btn-logout {
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    font-size: 0.82rem !important;
+    color: #dc2626 !important;
+    border-color: #fca5a5 !important;
+}
+.btn-password {
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    font-size: 0.82rem !important;
+    color: #2563eb !important;
+    border-color: #93c5fd !important;
+}

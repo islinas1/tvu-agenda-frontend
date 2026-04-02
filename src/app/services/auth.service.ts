@@ -8,17 +8,16 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl + '/auth';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
   login(ci: string, password?: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, { ci, password })
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, { ci, password })
       .pipe(
         tap(res => {
           if (res.token) {
             localStorage.setItem('token', res.token);
-            // Extraer user del token directamente
             const payload = JSON.parse(atob(res.token.split('.')[1]));
             localStorage.setItem('user', JSON.stringify(payload));
           }
@@ -26,41 +25,8 @@ export class AuthService {
       );
   }
 
-  getUser() {
-    const raw = localStorage.getItem('user');
-    if (!raw || raw === 'undefined' || raw === 'null') return {};
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return {};
-    }
-  }
-
-  getRole(): number {
-    const user = this.getUser();
-    // El token tiene role_id como numero directo
-    if (user.role_id) return user.role_id;
-    // Fallback: si tiene role como string
-    if (user.role === 'admin') return 1;
-    if (user.role === 'usuario') return 2;
-    return 0;
-  }
-
-  isAdmin(): boolean {
-    return this.getRole() === 1;
-  }
-
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  }
-
   checkCI(ci: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/check-ci`, { ci }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/auth/check-ci`, { ci }).pipe(
       tap(res => {
         if (res.token) {
           localStorage.setItem('token', res.token);
@@ -69,5 +35,36 @@ export class AuthService {
         }
       })
     );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/users/change-password`, { currentPassword, newPassword });
+  }
+
+  getUser() {
+    const raw = localStorage.getItem('user');
+    if (!raw || raw === 'undefined' || raw === 'null') return {};
+    try { return JSON.parse(raw); } catch { return {}; }
+  }
+
+  getUserName(): string {
+    const user = this.getUser();
+    return user.name || 'Usuario';
+  }
+
+  getRole(): number {
+    const user = this.getUser();
+    if (user.role_id) return user.role_id;
+    if (user.role === 'admin') return 1;
+    if (user.role === 'usuario') return 2;
+    return 0;
+  }
+
+  isAdmin(): boolean { return this.getRole() === 1; }
+  isLoggedIn(): boolean { return !!localStorage.getItem('token'); }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
 }

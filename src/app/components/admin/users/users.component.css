@@ -408,3 +408,51 @@
         font-size: 0.82rem;
     }
 }
+.password-panel {
+    background: linear-gradient(180deg, #f0f7ff 0%, #e0edfc 100%);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+.password-title {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #102341;
+    text-align: center;
+}
+.password-hint {
+    font-size: 0.82rem;
+    color: #64748b;
+    text-align: center;
+    margin: 0 0 14px;
+}
+.pw-field { width: 100%; }
+.pw-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+}
+.pw-actions button { border-radius: 12px !important; font-weight: 700; }
+.msg-exito {
+    color: #15803d;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 8px;
+    margin: 0 0 10px;
+}
+.msg-error {
+    color: #dc2626;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+    background: rgba(220, 38, 38, 0.08);
+    border-radius: 8px;
+    margin: 0 0 10px;
+}

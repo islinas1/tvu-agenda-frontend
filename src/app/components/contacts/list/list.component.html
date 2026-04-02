@@ -13,25 +13,33 @@
 
     <div class="divider"></div>
 
+    <!-- Boton logout -->
+    <div class="top-bar">
+      <span></span>
+      <button mat-stroked-button class="btn-logout" (click)="cerrarSesion()">
+        <mat-icon>logout</mat-icon> Cerrar sesion
+      </button>
+    </div>
+
     <div class="title-block">
       <h1 class="title">AGENDA DE</h1>
       <h2 class="title title-strong">CONTACTOS</h2>
     </div>
 
-    <!-- Formulario de edicion inline -->
+    <!-- Panel edicion -->
     <div class="edit-panel" *ngIf="editingId">
       <h3 class="edit-title">Editar contacto</h3>
       <mat-form-field appearance="outline" class="edit-field">
         <mat-label>Nombre</mat-label>
-        <input matInput [(ngModel)]="editData.contact_name">
+        <input matInput [(ngModel)]="editData.contact_name" style="text-transform: uppercase;">
       </mat-form-field>
       <mat-form-field appearance="outline" class="edit-field">
         <mat-label>Institucion</mat-label>
-        <input matInput [(ngModel)]="editData.contact_institution">
+        <input matInput [(ngModel)]="editData.contact_institution" style="text-transform: uppercase;">
       </mat-form-field>
       <mat-form-field appearance="outline" class="edit-field">
         <mat-label>Cargo</mat-label>
-        <input matInput [(ngModel)]="editData.contact_position">
+        <input matInput [(ngModel)]="editData.contact_position" style="text-transform: uppercase;">
       </mat-form-field>
       <div class="edit-actions">
         <button mat-raised-button color="primary" (click)="saveEdit()">
@@ -54,8 +62,7 @@
 
       <button mat-raised-button color="secondary" class="new-button" type="button"
         (click)="newContact()" *ngIf="isAdmin()">
-        <mat-icon>add</mat-icon>
-        <span>Nuevo contacto</span>
+        <mat-icon>add</mat-icon> <span>Nuevo contacto</span>
       </button>
     </div>
 
@@ -68,6 +75,16 @@
         <button mat-stroked-button type="button" class="filter-button"
           [class.filter-active]="isFilterActive('position')" (click)="toggleFilter('position')">Cargo</button>
       </div>
+    </div>
+
+    <!-- Botones de exportacion -->
+    <div class="export-bar" *ngIf="!editingId && filteredContacts.length > 0">
+      <button mat-stroked-button class="btn-export" (click)="exportCSV()">
+        <mat-icon>table_chart</mat-icon> Exportar Excel
+      </button>
+      <button mat-stroked-button class="btn-export" (click)="exportPDF()">
+        <mat-icon>picture_as_pdf</mat-icon> Exportar PDF
+      </button>
     </div>
 
     <div class="table-shell" *ngIf="!editingId">
@@ -105,7 +122,6 @@
             <td mat-cell *matCellDef="let contact">{{ contact.contact_institution || '-' }}</td>
           </ng-container>
 
-          <!-- SIN *ngIf, la visibilidad se controla con displayedColumns -->
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
             <td mat-cell *matCellDef="let row">

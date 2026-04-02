@@ -254,3 +254,35 @@
 .link-login .link:hover {
     text-decoration: underline;
 }
+
+.mensaje-error {
+    color: #dc2626;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0 12px;
+    padding: 8px;
+    background: rgba(220, 38, 38, 0.08);
+    border-radius: 8px;
+}
+ 
+.mensaje-activacion {
+    color: #1e40af;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.5;
+    margin: 12px 0;
+    padding: 12px;
+    background: rgba(37, 99, 235, 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(37, 99, 235, 0.15);
+}
+ 
+.mensaje-redireccion {
+    color: #64748b;
+    font-size: 0.85rem;
+    text-align: center;
+    font-style: italic;
+    margin: 8px 0 0;
+}

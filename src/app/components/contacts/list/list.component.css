@@ -421,3 +421,16 @@
 .confirm-yes { color: #dc2626 !important; }
 .confirm-no { color: #64748b !important; }
  
+.export-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.btn-export {
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    font-size: 0.82rem !important;
+    color: #102341 !important;
+    border-color: #cbd5e1 !important;
+}

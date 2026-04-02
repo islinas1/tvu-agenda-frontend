@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,7 +19,11 @@ export class LoginComponent {
 	password: string = '';
 	requirePassword: boolean = false;
 
-	constructor(private router: Router, private authService: AuthService) { }
+	constructor(
+		private router: Router,
+		private authService: AuthService,
+		private cd: ChangeDetectorRef
+	) { }
 
 	ingresar() {
 		if (!this.ci.trim()) {
@@ -35,12 +39,11 @@ export class LoginComponent {
 					}
 					if (res.role === 'admin') {
 						this.requirePassword = true;
-						setTimeout(() => document.getElementById('passwordInput')?.focus(), 0);
+						this.cd.detectChanges();
+						setTimeout(() => document.getElementById('passwordInput')?.focus(), 50);
 					}
 				},
-				error: (err: any) => {
-					alert(err.error?.error || 'Error al verificar C.I.');
-				}
+				error: (err: any) => alert(err.error?.error || 'Error al verificar C.I.')
 			});
 			return;
 		}
@@ -53,14 +56,17 @@ export class LoginComponent {
 		this.authService.login(this.ci, this.password).subscribe({
 			next: (res: any) => {
 				if (res.role === 'admin') {
+					if (res.passwordExpired) {
+						alert('Su contraseña ha expirado. Debe cambiarla en el dashboard.');
+					} else if (res.daysUntilExpiry !== undefined && res.daysUntilExpiry <= 15) {
+						alert(`Su contraseña expira en ${res.daysUntilExpiry} dias. Recuerde cambiarla.`);
+					}
 					this.router.navigate(['/dashboard']);
 				} else {
 					this.router.navigate(['/contacts']);
 				}
 			},
-			error: (err: any) => {
-				alert(err.error?.error || 'Error al iniciar sesion');
-			}
+			error: (err: any) => alert(err.error?.error || 'Error al iniciar sesion')
 		});
 	}
 }

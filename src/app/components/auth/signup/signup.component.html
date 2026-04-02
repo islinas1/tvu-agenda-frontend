@@ -12,20 +12,23 @@
             </div>
         </div>
 
-        <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <p class="mensaje-error" *ngIf="errorMessage">{{ errorMessage }}</p>
 
+        <!-- FORMULARIO (se oculta al registrar exitosamente) -->
         <div class="formulario-columna" *ngIf="!registroExitoso">
             <div class="grupo-campo">
                 <label class="etiqueta-campo">Nombre</label>
                 <mat-form-field appearance="outline" class="campo-redondo">
-                    <input matInput type="text" [(ngModel)]="nombre" placeholder="Ingrese su nombre">
+                    <input matInput type="text" [(ngModel)]="nombre" placeholder="Ingrese su nombre"
+                        style="text-transform: uppercase;" (input)="toUpper('nombre')">
                 </mat-form-field>
             </div>
 
             <div class="grupo-campo">
                 <label class="etiqueta-campo">Apellido</label>
                 <mat-form-field appearance="outline" class="campo-redondo">
-                    <input matInput type="text" [(ngModel)]="apellido" placeholder="Ingrese su apellido">
+                    <input matInput type="text" [(ngModel)]="apellido" placeholder="Ingrese su apellido"
+                        style="text-transform: uppercase;" (input)="toUpper('apellido')">
                 </mat-form-field>
             </div>
 
@@ -55,18 +58,27 @@
         </div>
     </div>
 
+    <!-- MENSAJE DE EXITO (aparece despues de registrar) -->
     <mat-card class="panel-resultado" *ngIf="registroExitoso">
         <div class="resultado-icono">
             <mat-icon>check_circle</mat-icon>
         </div>
 
         <h3>Registro completado</h3>
-        <p>Su cuenta fue creada. Un administrador debe activarla antes de que pueda ingresar.</p>
+
+        <p class="mensaje-activacion">
+            Su cuenta fue creada exitosamente. Debe esperar a que un administrador
+            active su C.I. antes de poder ingresar al sistema.
+        </p>
+
+        <p class="mensaje-redireccion">
+            Redirigiendo al login en {{ countdown }} segundos...
+        </p>
 
         <button mat-raised-button type="button" class="boton-guardar" (click)="irAlLogin()"
             style="width: 100%; margin-top: 12px;">
             <mat-icon>arrow_back</mat-icon>
-            Ir al login
+            Ir al login ahora
         </button>
     </mat-card>
 </div>

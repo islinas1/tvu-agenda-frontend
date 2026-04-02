@@ -12,13 +12,18 @@
             </div>
         </div>
 
+        <!-- Mensaje de exito o error -->
+        <p class="mensaje-exito" *ngIf="tipoMensaje === 'exito'">{{ mensaje }}</p>
+        <p class="mensaje-error" *ngIf="tipoMensaje === 'error'">{{ mensaje }}</p>
+
         <form [formGroup]="formulario" class="formulario-columna">
 
             <div class="grupo-campo">
                 <label class="etiqueta-campo">Nombre</label>
                 <mat-form-field appearance="outline" class="campo-redondo">
-                    <input matInput formControlName="nombre" placeholder="Ingrese el nombre" /> @if
-                    (formulario.get('nombre')?.hasError('required') && formulario.get('nombre')?.touched) {
+                    <input matInput formControlName="nombre" placeholder="Ingrese el nombre"
+                        style="text-transform: uppercase;" (input)="toUpper('nombre')" />
+                    @if (formulario.get('nombre')?.hasError('required') && formulario.get('nombre')?.touched) {
                     <mat-error>El nombre es obligatorio</mat-error>
                     } @if (formulario.get('nombre')?.hasError('minlength') && formulario.get('nombre')?.touched) {
                     <mat-error>Debe tener al menos 2 caracteres</mat-error>
@@ -27,18 +32,20 @@
             </div>
 
             <div class="grupo-campo">
-                <label class="etiqueta-campo">Teléfono</label>
+                <label class="etiqueta-campo">Telefono</label>
                 <div formArrayName="telefonos" class="telefonos-container">
                     <div *ngFor="let tel of telefonos.controls; let i = index" class="telefono-item">
                         <mat-form-field appearance="outline" class="campo-redondo telefono-input">
-                            <input matInput [formControlName]="i" placeholder="Ingrese el teléfono" />
+                            <input matInput [formControlName]="i" placeholder="Ingrese el telefono" />
                             <mat-error *ngIf="telefonos.at(i).touched && telefonos.at(i).invalid">
-                                Teléfono inválido
+                                Telefono invalido
                             </mat-error>
                         </mat-form-field>
+
                         <button mat-icon-button color="warn" (click)="removePhone(i)" *ngIf="telefonos.length > 1">
                             <mat-icon>remove</mat-icon>
                         </button>
+
                         <button mat-icon-button color="primary" (click)="addPhone()" *ngIf="i === telefonos.length - 1"
                             [disabled]="telefonos.at(i).invalid">
                             <mat-icon>add</mat-icon>
@@ -50,8 +57,9 @@
             <div class="grupo-campo">
                 <label class="etiqueta-campo">Cargo</label>
                 <mat-form-field appearance="outline" class="campo-redondo">
-                    <input matInput formControlName="cargo" placeholder="Ingrese el cargo" /> @if
-                    (formulario.get('cargo')?.hasError('required') && formulario.get('cargo')?.touched) {
+                    <input matInput formControlName="cargo" placeholder="Ingrese el cargo"
+                        style="text-transform: uppercase;" (input)="toUpper('cargo')" />
+                    @if (formulario.get('cargo')?.hasError('required') && formulario.get('cargo')?.touched) {
                     <mat-error>El cargo es obligatorio</mat-error>
                     } @if (formulario.get('cargo')?.hasError('minlength') && formulario.get('cargo')?.touched) {
                     <mat-error>Debe tener al menos 2 caracteres</mat-error>
@@ -60,13 +68,11 @@
             </div>
 
             <div class="grupo-campo">
-                <label class="etiqueta-campo">Institución</label>
+                <label class="etiqueta-campo">Institucion</label>
                 <mat-form-field appearance="outline" class="campo-redondo">
-                    <input matInput formControlName="institucion" placeholder="Ingrese la institución" /> @if
-                    (formulario.get('institucion')?.hasError('required') && formulario.get('institucion')?.touched) {
-                    <mat-error>La institución es obligatoria</mat-error>
-                    } @if (formulario.get('institucion')?.hasError('minlength') &&
-                    formulario.get('institucion')?.touched) {
+                    <input matInput formControlName="institucion" placeholder="Ingrese la institucion (opcional)"
+                        style="text-transform: uppercase;" (input)="toUpper('institucion')" />
+                    @if (formulario.get('institucion')?.hasError('minlength') && formulario.get('institucion')?.touched) {
                     <mat-error>Debe tener al menos 2 caracteres</mat-error>
                     }
                 </mat-form-field>
@@ -77,26 +83,13 @@
                     <mat-icon>arrow_back</mat-icon>
                     Volver
                 </button>
-                <button mat-raised-button class="boton-guardar" type="button" (click)="createContact()">
+
+                <button mat-raised-button class="boton-guardar" type="button"
+                    (click)="createContact()" [disabled]="guardando">
                     <mat-icon>check_circle</mat-icon>
-                    Guardar contacto
+                    {{ guardando ? 'Guardando...' : 'Guardar contacto' }}
                 </button>
             </div>
         </form>
     </div>
-
-    @if (datosGuardados) {
-    <mat-card class="panel-resultado">
-        <div class="resultado-icono">
-            <mat-icon>task_alt</mat-icon>
-        </div>
-
-        <h3>Contacto registrado</h3>
-
-        <p><strong>Nombre:</strong> {{ datosGuardados.nombre }}</p>
-        <p><strong>Institución:</strong> {{ datosGuardados.institucion }}</p>
-        <p><strong>Teléfono:</strong> {{ datosGuardados.telefono }}</p>
-        <p><strong>Cargo:</strong> {{ datosGuardados.cargo }}</p>
-    </mat-card>
-    }
 </div>

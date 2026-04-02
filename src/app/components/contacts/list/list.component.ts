@@ -33,14 +33,10 @@ export class ContactsComponent implements OnInit {
   activeFilters: Set<string> = new Set();
   allContacts: Contact[] = [];
   filteredContacts: Contact[] = [];
-  // Sin 'actions' por defecto, se agrega en ngOnInit si es admin
   displayedColumns: string[] = ['name', 'phones', 'position', 'institution'];
 
-  // Para edicion inline
   editingId: number | null = null;
   editData = { contact_name: '', contact_institution: '', contact_position: '', description: '' };
-
-  // Para confirmacion de eliminar
   confirmDeleteId: number | null = null;
 
   ngOnInit(): void {
@@ -90,13 +86,15 @@ export class ContactsComponent implements OnInit {
   }
 
   newContact(): void { this.router.navigate(['/register']); }
-  toggleFilter(filter: string): void {
-    this.activeFilters.has(filter) ? this.activeFilters.delete(filter) : this.activeFilters.add(filter);
-    this.applyFilters();
-  }
-  isFilterActive(filter: string): boolean { return this.activeFilters.has(filter); }
+  toggleFilter(f: string): void { this.activeFilters.has(f) ? this.activeFilters.delete(f) : this.activeFilters.add(f); this.applyFilters(); }
+  isFilterActive(f: string): boolean { return this.activeFilters.has(f); }
   clearSearch(): void { this.searchQuery = ''; this.applyFilters(); }
   isAdmin(): boolean { return this.authService.isAdmin(); }
+
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 
   // ======== EDITAR ========
   editContact(contact: Contact): void {
@@ -108,41 +106,87 @@ export class ContactsComponent implements OnInit {
       description: contact.description || ''
     };
   }
-
-  cancelEdit(): void {
-    this.editingId = null;
-  }
-
+  cancelEdit(): void { this.editingId = null; }
   saveEdit(): void {
     if (!this.editingId || !this.editData.contact_name.trim()) return;
-    this.contactService.updateContact(this.editingId, {
-      ...this.editData,
-      is_active: true
-    }).subscribe({
-      next: () => {
-        this.editingId = null;
-        this.loadContacts();
-      },
+    this.contactService.updateContact(this.editingId, { ...this.editData, is_active: true }).subscribe({
+      next: () => { this.editingId = null; this.loadContacts(); },
       error: (err) => alert(err.error?.error || 'Error al actualizar')
     });
   }
 
-  // ======== ELIMINAR (desactivar) ========
-  deleteContact(contact: Contact): void {
-    this.confirmDeleteId = contact.id_contact;
-  }
-
-  cancelDelete(): void {
-    this.confirmDeleteId = null;
-  }
-
+  // ======== ELIMINAR ========
+  deleteContact(contact: Contact): void { this.confirmDeleteId = contact.id_contact; }
+  cancelDelete(): void { this.confirmDeleteId = null; }
   confirmDelete(id: number): void {
     this.contactService.deactivateContact(id).subscribe({
-      next: () => {
-        this.confirmDeleteId = null;
-        this.loadContacts();
-      },
+      next: () => { this.confirmDeleteId = null; this.loadContacts(); },
       error: (err) => alert(err.error?.error || 'Error al eliminar')
     });
+  }
+
+  // ======== EXPORTAR CSV (Excel) ========
+  exportCSV(): void {
+    const data = this.filteredContacts.map(c => ({
+      Nombre: c.contact_name || '',
+      Institucion: c.contact_institution || 'INDEPENDIENTE',
+      Cargo: c.contact_position || '',
+      Telefonos: c.phones?.map(p => p.phone).join(' / ') || '',
+      Estado: c.is_active ? 'Activo' : 'Inactivo'
+    }));
+
+    const headers = Object.keys(data[0] || {});
+    const csv = [
+      headers.join(','),
+      ...data.map(row => headers.map(h => `"${(row as any)[h]}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'contactos.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ======== EXPORTAR PDF (print) ========
+  exportPDF(): void {
+    const rows = this.filteredContacts.map(c =>
+      `<tr>
+        <td>${c.contact_name}</td>
+        <td>${c.contact_institution || 'INDEPENDIENTE'}</td>
+        <td>${c.contact_position || '-'}</td>
+        <td>${c.phones?.map(p => p.phone).join(', ') || '-'}</td>
+      </tr>`
+    ).join('');
+
+    const html = `
+      <html><head><title>Agenda de Contactos</title>
+      <style>
+        body { font-family: Arial; padding: 20px; }
+        h1 { text-align: center; color: #102341; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #102341; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid #ddd; }
+        tr:nth-child(even) { background: #f5f5f5; }
+      </style></head>
+      <body>
+        <h1>AGENDA DE CONTACTOS</h1>
+        <p>Radio Universitaria y Television Universitaria</p>
+        <p>Total: ${this.filteredContacts.length} contactos</p>
+        <table>
+          <thead><tr><th>Nombre</th><th>Institucion</th><th>Cargo</th><th>Telefonos</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </body></html>
+    `;
+
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+      setTimeout(() => { win.print(); }, 500);
+    }
   }
 }

@@ -31,12 +31,14 @@ export class RegisterComponent {
 	private contactService = inject(ContactService);
 
 	formulario: FormGroup;
-	datosGuardados: any = null;
+	guardando: boolean = false;
+	mensaje: string = '';
+	tipoMensaje: 'exito' | 'error' | '' = '';
 
 	constructor(private fb: FormBuilder) {
 		this.formulario = this.fb.group({
 			nombre: ['', [Validators.required, Validators.minLength(2)]],
-			institucion: ['', [Validators.required, Validators.minLength(2)]],
+			institucion: ['', [Validators.minLength(2)]],
 			cargo: ['', [Validators.required, Validators.minLength(2)]],
 			telefonos: this.fb.array([
 				this.fb.control('', [Validators.required, Validators.pattern(/^[0-9]{7,10}$/)])
@@ -44,7 +46,13 @@ export class RegisterComponent {
 		});
 	}
 
-	// guardar contacto en la base de datos a través del servicio ContactService
+	toUpper(controlName: string): void {
+		const control = this.formulario.get(controlName);
+		if (control) {
+			control.setValue(control.value?.toUpperCase(), { emitEvent: false });
+		}
+	}
+
 	createContact(): void {
 		if (this.formulario.invalid) {
 			this.formulario.markAllAsTouched();
@@ -55,28 +63,36 @@ export class RegisterComponent {
 			.filter((t: string) => t && t.trim() !== '');
 
 		if (telefonosValidos.length === 0) {
-			alert('Debe ingresar al menos un teléfono válido');
+			this.mensaje = 'Debe ingresar al menos un telefono valido';
+			this.tipoMensaje = 'error';
 			return;
 		}
 
+		this.guardando = true;
+		this.mensaje = '';
+
 		const nuevoContacto = {
-			contact_name: this.formulario.value.nombre,
-			contact_institution: this.formulario.value.institucion,
-			contact_position: this.formulario.value.cargo,
+			contact_name: this.formulario.value.nombre.toUpperCase(),
+			contact_institution: this.formulario.value.institucion?.trim().toUpperCase() || 'INDEPENDIENTE',
+			contact_position: this.formulario.value.cargo.toUpperCase(),
 			description: '',
 			created_by: 1,
-			phones: telefonosValidos.map((t: string) => ({
-				phone: t
-			}))
+			phones: telefonosValidos.map((t: string) => ({ phone: t }))
 		};
 
 		this.contactService.createContact(nuevoContacto).subscribe({
-			next: (contact) => {
-				console.log('Contacto creado:', contact);
-				this.datosGuardados = contact;
-				this.limpiarFormulario();
+			next: () => {
+				this.guardando = false;
+				this.mensaje = 'Contacto registrado exitosamente. Redirigiendo...';
+				this.tipoMensaje = 'exito';
+				// Redirigir a la lista de contactos despues de 2 segundos
+				setTimeout(() => this.router.navigate(['/contacts']), 2000);
 			},
-			error: (err) => console.error('Error al crear contacto', err)
+			error: (err) => {
+				this.guardando = false;
+				this.mensaje = err.error?.error || 'Error al crear contacto';
+				this.tipoMensaje = 'error';
+			}
 		});
 	}
 
@@ -99,15 +115,4 @@ export class RegisterComponent {
 	backToList(): void {
 		this.router.navigate(['/contacts']);
 	}
-
-	limpiarFormulario(): void {
-		this.formulario.reset({
-			nombre: '',
-			institucion: '',
-			telefono: '',
-			cargo: ''
-		});
-		this.datosGuardados = null;
-	}
-
 }
