@@ -94,7 +94,6 @@
     color: #0d2240;
 }
 
-/* --- BUSCADOR (NUEVA ESTRUCTURA) --- */
 .search-container {
     width: 100%;
     margin-bottom: 14px;
@@ -192,7 +191,7 @@
 }
 
 
-/* === BOTONES DE ACCIONES === */
+
 .actions-cell {
   display: flex;
   justify-content: center;
@@ -255,7 +254,10 @@
     position: relative;
     z-index: 1;
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 400px;
 }
+
 
 .contacts-table {
     width: 100%;
@@ -433,4 +435,42 @@
     font-size: 0.82rem !important;
     color: #102341 !important;
     border-color: #cbd5e1 !important;
+}
+
+
+.contacts-table .mat-mdc-header-row,
+.control-table .mat-mdc-header-row {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.paginator {
+    background: transparent !important;
+    border-top: 1px solid rgba(37, 99, 235, 0.1)
+}
+
+::ng-deep .paginator .mat-mdc-paginattor-container {
+    padding: 4px 8px !important;
+    min-height: 48px !important;
+}
+
+::ng-deep .paginator .mat-mdc-paginator-page-size-label,
+::ng-deep .paginator .mat-mdc-paginator-range-label{
+    font-size: 0.78rem !important;
+    font-weight: 600;
+    color: #17345a !important;
+}
+
+::ng-deep .paginator .mat-mdc-select-value-text {
+    font-size: 0.78rem !important;
+    font-weight: 700;
+}
+ 
+::ng-deep .paginator .mat-mdc-icon-button {
+    color: #2563eb !important;
+}
+ 
+::ng-deep .paginator .mat-mdc-icon-button:disabled {
+    color: #cbd5e1 !important;
 }

@@ -1,12 +1,13 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { ContactService } from '../../../services/contact.service';
 import { Contact } from '../../../interfaces/contact.interface';
 import { Router } from '@angular/router';
@@ -18,21 +19,24 @@ import { AuthService } from '../../../services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, FormsModule, MatButtonModule, MatFormFieldModule,
-    MatInputModule, MatIconModule, MatTableModule, MatChipsModule
+    MatInputModule, MatIconModule, MatTableModule, MatChipsModule,
+    MatPaginatorModule
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ContactsComponent implements OnInit {
+export class ContactsComponent implements OnInit, AfterViewInit {
   constructor(private router: Router, private authService: AuthService) { }
 
   private contactService = inject(ContactService);
   private cd = inject(ChangeDetectorRef);
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   searchQuery: string = '';
   activeFilters: Set<string> = new Set();
   allContacts: Contact[] = [];
-  filteredContacts: Contact[] = [];
+  dataSource = new MatTableDataSource<Contact>([]);
   displayedColumns: string[] = ['name', 'phones', 'position', 'institution'];
 
   editingId: number | null = null;
@@ -46,11 +50,15 @@ export class ContactsComponent implements OnInit {
     this.loadContacts();
   }
 
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
+
   loadContacts(): void {
     this.contactService.getContacts().subscribe({
       next: (data) => {
         this.allContacts = data;
-        this.filteredContacts = data.slice();
+        this.dataSource.data = data;
         this.cd.markForCheck();
       },
       error: (err) => console.error('Error loading contacts', err)
@@ -60,11 +68,11 @@ export class ContactsComponent implements OnInit {
   applyFilters(): void {
     const text = this.searchQuery.trim().toLowerCase();
     if (text === '' && this.activeFilters.size === 0) {
-      this.filteredContacts = this.allContacts.slice();
+      this.dataSource.data = this.allContacts.slice();
       this.cd.markForCheck();
       return;
     }
-    this.filteredContacts = this.allContacts.filter(contact => {
+    this.dataSource.data = this.allContacts.filter(contact => {
       if (this.activeFilters.size > 0) {
         return Array.from(this.activeFilters).some(filterType => {
           let value: string | null | undefined;
@@ -82,6 +90,7 @@ export class ContactsComponent implements OnInit {
         (contact.phones?.some(p => p?.phone?.includes(text)) ?? false)
       );
     });
+    if (this.paginator) this.paginator.firstPage();
     this.cd.markForCheck();
   }
 
@@ -96,7 +105,6 @@ export class ContactsComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  // ======== EDITAR ========
   editContact(contact: Contact): void {
     this.editingId = contact.id_contact;
     this.editData = {
@@ -115,7 +123,6 @@ export class ContactsComponent implements OnInit {
     });
   }
 
-  // ======== ELIMINAR ========
   deleteContact(contact: Contact): void { this.confirmDeleteId = contact.id_contact; }
   cancelDelete(): void { this.confirmDeleteId = null; }
   confirmDelete(id: number): void {
@@ -125,22 +132,20 @@ export class ContactsComponent implements OnInit {
     });
   }
 
-  // ======== EXPORTAR CSV (Excel) ========
   exportCSV(): void {
-    const data = this.filteredContacts.map(c => ({
+    const allData = this.dataSource.filteredData;
+    const data = allData.map(c => ({
       Nombre: c.contact_name || '',
       Institucion: c.contact_institution || 'INDEPENDIENTE',
       Cargo: c.contact_position || '',
       Telefonos: c.phones?.map(p => p.phone).join(' / ') || '',
       Estado: c.is_active ? 'Activo' : 'Inactivo'
     }));
-
     const headers = Object.keys(data[0] || {});
     const csv = [
       headers.join(','),
       ...data.map(row => headers.map(h => `"${(row as any)[h]}"`).join(','))
     ].join('\n');
-
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -150,9 +155,9 @@ export class ContactsComponent implements OnInit {
     URL.revokeObjectURL(url);
   }
 
-  // ======== EXPORTAR PDF (print) ========
   exportPDF(): void {
-    const rows = this.filteredContacts.map(c =>
+    const allData = this.dataSource.filteredData;
+    const rows = allData.map(c =>
       `<tr>
         <td>${c.contact_name}</td>
         <td>${c.contact_institution || 'INDEPENDIENTE'}</td>
@@ -160,7 +165,6 @@ export class ContactsComponent implements OnInit {
         <td>${c.phones?.map(p => p.phone).join(', ') || '-'}</td>
       </tr>`
     ).join('');
-
     const html = `
       <html><head><title>Agenda de Contactos</title>
       <style>
@@ -174,14 +178,13 @@ export class ContactsComponent implements OnInit {
       <body>
         <h1>AGENDA DE CONTACTOS</h1>
         <p>Radio Universitaria y Television Universitaria</p>
-        <p>Total: ${this.filteredContacts.length} contactos</p>
+        <p>Total: ${allData.length} contactos</p>
         <table>
           <thead><tr><th>Nombre</th><th>Institucion</th><th>Cargo</th><th>Telefonos</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </body></html>
     `;
-
     const win = window.open('', '_blank');
     if (win) {
       win.document.write(html);

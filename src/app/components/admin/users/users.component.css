@@ -214,7 +214,10 @@
     position: relative;
     z-index: 1;
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 400px;
 }
+
 
 .control-table {
     width: 100%;
@@ -455,4 +458,11 @@
     background: rgba(220, 38, 38, 0.08);
     border-radius: 8px;
     margin: 0 0 10px;
+}
+
+.contacts-table .mat-mdc-header-row,
+.control-table .mat-mdc-header-row {
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }

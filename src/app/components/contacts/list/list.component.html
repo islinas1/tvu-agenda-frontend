@@ -13,7 +13,6 @@
 
     <div class="divider"></div>
 
-    <!-- Boton logout -->
     <div class="top-bar">
       <span></span>
       <button mat-stroked-button class="btn-logout" (click)="cerrarSesion()">
@@ -76,21 +75,20 @@
           [class.filter-active]="isFilterActive('position')" (click)="toggleFilter('position')">Cargo</button>
       </div>
     </div>
-
-    <!-- Botones de exportacion
-    <div class="export-bar" *ngIf="!editingId && filteredContacts.length > 0">
+    
+    <div class="export-bar" *ngIf="!editingId && isAdmin() && dataSource.data.length > 0">
       <button mat-stroked-button class="btn-export" (click)="exportCSV()">
         <mat-icon>table_chart</mat-icon> Exportar Excel
       </button>
       <button mat-stroked-button class="btn-export" (click)="exportPDF()">
         <mat-icon>picture_as_pdf</mat-icon> Exportar PDF
       </button>
-    </div> -->
-
+    </div>
+ 
     <div class="table-shell" *ngIf="!editingId">
       <div class="table-watermark"></div>
       <div class="table-scroll">
-        <table mat-table [dataSource]="filteredContacts" class="contacts-table">
+        <table mat-table [dataSource]="dataSource" class="contacts-table">
 
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef>Nombre</th>
@@ -149,6 +147,14 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
       </div>
+
+      <!-- Paginador -->
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 20]"
+        [pageSize]="10"
+        showFirstLastButtons
+        class="paginator">
+      </mat-paginator>
     </div>
   </div>
 </div>
